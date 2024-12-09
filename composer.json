@@ -8,7 +8,8 @@
         "php-di/slim-bridge": "^3.4",
         "bryanjhv/slim-session": "~4.0",
         "selective/basepath": "^2.2",
-        "slim/twig-view": "^3.4"
+        "slim/twig-view": "^3.4",
+        "illuminate/database": "^10.48"
     },
     "autoload": {
         "psr-4": {
