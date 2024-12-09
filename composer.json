@@ -1,0 +1,22 @@
+{
+    "require": {
+        "slim/slim": "4.*",
+        "slim/psr7": "^1.7",
+        "slim/csrf": "^1.5",
+        "illuminate/config": "^10.48",
+        "vlucas/phpdotenv": "^5.6",
+        "php-di/slim-bridge": "^3.4",
+        "bryanjhv/slim-session": "~4.0",
+        "selective/basepath": "^2.2",
+        "slim/twig-view": "^3.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Bootstrap\\": "bootstrap/"
+        }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^6.4"
+    }
+}

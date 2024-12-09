@@ -1,0 +1,8 @@
+#web server configuration
+#https://www.slimframework.com/docs/v4/start/web-servers.html
+
+#https://akrabat.com/running-slim-4-in-a-subdirectory/
+
+RewriteEngine on
+RewriteRule ^$ public/ [L]
+RewriteRule (.*) public/$1 [L]
