@@ -26,9 +26,7 @@ class ContainerServices
     public function __construct($app)
     {
         $this->app = $app;
-        
         $this->container = $app->getContainer();
-
     }
 
     /**
@@ -42,7 +40,6 @@ class ContainerServices
         if (is_callable($service))
         {
             $this->container->set($key, $service);
-
         }
         else 
         {
@@ -54,7 +51,6 @@ class ContainerServices
      * Register all services within the container
      * @return void
      */
-    //registerContainerServices() method in Application.php calls this method
     public function registerAllServices()
     {
         /**
@@ -62,12 +58,11 @@ class ContainerServices
          */
         // $this->registerCache();
         // $this->registerCsrf();
-        // $this->registerDatabase();
-        // $this->registerEloquent();
+        $this->registerDatabase();
+        $this->registerEloquent();
         // $this->registerMailer();
         // $this->registerMonolog();
         $this->registerSession();
-
         /**
          * Register Twig and View-related services
          */
@@ -75,7 +70,7 @@ class ContainerServices
         // $this->registerSlugify();
         // $this->registerTranslator();
         $this->registerTwig();
-       
+
         $this->registerUtil();
 
         /**
@@ -122,27 +117,23 @@ class ContainerServices
      */
     public function registerDatabase()
     {
+        $container = $this->container;
 
-        $data = $this->container->get('settings')['db'];
+        $data = $container->get('settings')['db'];
 
-        $this->container->set('database', function () {
+        $database = new \App\Model\Core\Database(
+            "{$data['dbms']}:host={$data['host']};dbname={$data['database']}",
+            $data['username'],
+            $data['password']
+        );
 
-            $data = $this->container->get('settings')['db'];
+        $database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $database->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        $database->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $database->exec("set names utf8");
 
-            $database = new \App\Model\Core\Database(
-                "{$data['dbms']}:host={$data['host']};dbname={$data['database']}",
-                $data['username'],
-                $data['password']
-            );
+        $container->set('database', $database);
 
-            $database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $database->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-            $database->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-            $database->exec("set names utf8");
-
-            return $database;
-        });
-        
     }
 
     /**
@@ -151,27 +142,31 @@ class ContainerServices
      */
     public function registerEloquent()
     {
-        $this->registerService('eloquent', function () {
-            $data = $this->container['settings']['db'];
+        $container = $this->container;
 
-            $capsule = new \Illuminate\Database\Capsule\Manager;
+        $data = $container->get('settings')['db'];
 
-            $capsule->addConnection([
-                'driver' => $data['dbms'],
-                'host' => $data['host'],
-                'database' => $data['database'],
-                'username' => $data['username'],
-                'password' => $data['password'],
-                'charset'   => 'utf8',
-                'collation' => 'utf8_unicode_ci',
-                'prefix'    => ''
-            ]);
+        $capsule = new \Illuminate\Database\Capsule\Manager;
 
-            $capsule->setAsGlobal();
-            $capsule->bootEloquent();
+        $capsule->addConnection([
+            'driver' => $data['dbms'],
+            'host' => $data['host'],
+            'database' => $data['database'],
+            'username' => $data['username'],
+            'password' => $data['password'],
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => ''
+        ]);
 
-            return $capsule;
-        });
+        $capsule->setAsGlobal();
+        $capsule->bootEloquent();
+
+        $container->set('eloquent', $capsule);
+
+        dump($container);
+
+        die;
     }
 
     /**
@@ -269,6 +264,7 @@ class ContainerServices
      */
     public function registerTwig()
     {
+        
         $this->registerService('twig', function () {
             $paths = [
                 'templates' => __DIR__ . "/../web/templates",
@@ -367,6 +363,7 @@ class ContainerServices
         });
     }
     
+
     /**
      * Register 'util' on the container
      * @return void
