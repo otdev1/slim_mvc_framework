@@ -36,11 +36,7 @@ class Application
 
         $this->createAppInstance();
 
-        //$this->registerDatabase();
-
         $this->registerContainerServices();
-
-        // $this->registerMiddlewares();
 
         $this->registerRoutes();
     }
