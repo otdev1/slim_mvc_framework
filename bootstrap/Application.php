@@ -62,7 +62,6 @@ class Application
 
         $container = new Container();
 
-
         $container->set("settings", $config);
 
         /*
