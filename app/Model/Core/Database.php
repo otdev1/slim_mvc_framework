@@ -10,8 +10,12 @@ class Database extends \PDO
      * @param  array  $data  row columns
      * @return boolean       success on insert
      */
-    public function insert(string $table, array $data)
+    public function insert(object $entity)
     {
+        $table = $entity->getTable();
+
+        $data = $entity->getData();
+        
         if (empty($table)) {
             throw new \Exception("Table name not provided.");
         }
@@ -56,7 +60,15 @@ class Database extends \PDO
         $exec = $sql->execute();
 
         if (!$exec) {
-            throw new \Exception($this->errorInfo());
+            // throw new \Exception($this->errorInfo());
+            /* $this->errorInfo() returns an array and \Exception() expects its argument to be a string so the array must
+               converted to a string see link below
+            */
+            throw new \Exception(json_encode($this->errorInfo()));
+            /*
+              see https://www.geeksforgeeks.org/how-to-convert-array-to-string-in-php/#:~:text=Computer%20Science%20Portal-,Using%20json_encode(),-Function
+              https://www.geeksforgeeks.org/how-to-convert-array-to-string-in-php/
+            */
         }
 
         return true;
