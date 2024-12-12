@@ -2,6 +2,7 @@
 
 namespace Bootstrap;
 
+use App\Controller\AuthController;
 use App\Controller\IndexController;
 
 class Router
@@ -29,5 +30,8 @@ class Router
     {
         $this->app->get('/', IndexController::class . ':index')->setName('index');
 
+        $this->app->get('/register', AuthController::class . ':registerView')->setName('register');
+
+        $this->app->post('/register', AuthController::class . ':register');
     }
 }
