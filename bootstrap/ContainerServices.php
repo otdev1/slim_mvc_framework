@@ -163,10 +163,6 @@ class ContainerServices
         $capsule->bootEloquent();
 
         $container->set('eloquent', $capsule);
-
-        dump($container);
-
-        die;
     }
 
     /**
