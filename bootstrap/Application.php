@@ -64,16 +64,6 @@ class Application
 
         $container->set("settings", $config);
 
-        /*
-          dump() is not a built-in function and can only be used after installing the VarDumper Component
-          provided by symfony. dum() is equivalent to dd() in Laravel
-          https://symfony.com/doc/current/components/var_dumper.html
-        */
-
-        // dump($container->get("settings"));
-        // die;
-
-
         $this->registerDatabase($container);
 
         AppFactory::setContainer($container); 
@@ -115,25 +105,19 @@ class Application
 
     public function registerDatabase(Container $container)
     {
-            $result = (function () use ($container)
-            {
+        $data = $container->get('settings')['db'];
 
-                $data = $container->get('settings')['db'];
+        $database = new \App\Model\Core\Database(
+            "{$data['dbms']}:host={$data['host']};dbname={$data['database']}",
+            $data['username'],
+            $data['password']
+        );
 
-                $database = new \App\Model\Core\Database(
-                    "{$data['dbms']}:host={$data['host']};dbname={$data['database']}",
-                    $data['username'],
-                    $data['password']
-                );
+        $database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $database->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        $database->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
+        $database->exec("set names utf8");
 
-                $database->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                $database->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                $database->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
-                $database->exec("set names utf8");
-
-                return $database;
-            })();
-
-            $container->set('database', $result);
+        $container->set('database', $database);
     }
 }
