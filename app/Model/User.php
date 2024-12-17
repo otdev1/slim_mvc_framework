@@ -2,12 +2,17 @@
 
 namespace App\Model;
 
-use App\Model\Core\Model;
+use App\Model\Core\EnhancedModel;
+use Psr\Container\ContainerInterface;
+use Illuminate\Database\Eloquent\Model;
 
-use App\Model\Core\Database;
-
-class User 
+class User extends EnhancedModel
 {
-    use Model;
+    protected $tablename = 'users'; 
+    
+    protected $capsule;
 
+    public function __construct()
+    {
+    }
 }
