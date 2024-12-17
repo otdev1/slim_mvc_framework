@@ -2,6 +2,7 @@
 
 namespace Bootstrap;
 
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 
@@ -51,6 +52,7 @@ class ContainerServices
      * Register all services within the container
      * @return void
      */
+    //registerContainerServices() method in Application.php calls this method
     public function registerAllServices()
     {
         /**
@@ -63,6 +65,7 @@ class ContainerServices
         // $this->registerMailer();
         // $this->registerMonolog();
         $this->registerSession();
+
         /**
          * Register Twig and View-related services
          */
@@ -133,7 +136,6 @@ class ContainerServices
         $database->exec("set names utf8");
 
         $container->set('database', $database);
-
     }
 
     /**
@@ -146,7 +148,9 @@ class ContainerServices
 
         $data = $container->get('settings')['db'];
 
-        $capsule = new \Illuminate\Database\Capsule\Manager;
+        //$capsule = new \Illuminate\Database\Capsule\Manager;
+
+        $capsule = new Capsule();
 
         $capsule->addConnection([
             'driver' => $data['dbms'],
@@ -260,7 +264,6 @@ class ContainerServices
      */
     public function registerTwig()
     {
-        
         $this->registerService('twig', function () {
             $paths = [
                 'templates' => __DIR__ . "/../web/templates",
@@ -268,6 +271,16 @@ class ContainerServices
             ];
 
             $twig = Twig::create($paths['templates'], ['cache' => false]);
+
+            /* 
+                IN PRODUCTION/LIVE ENVIRONMENT USE CODE BELOW
+                $twig = Twig::create($paths['templates'], ['cache' => $paths['cache']]);
+
+                 For production scenarios, cache should be set to some 'path/to/cache' to store compiled templates 
+                 (thus avoiding recompilation on every request). For more information, 
+                 see Twig environment options
+                 https://twig.symfony.com/doc/3.x/api.html#environment-options
+            */
 
             // Add Twig-View Middleware
             $this->app->add(TwigMiddleware::create($this->app, $twig));
@@ -358,7 +371,6 @@ class ContainerServices
             return $twig;
         });
     }
-    
 
     /**
      * Register 'util' on the container
@@ -366,14 +378,15 @@ class ContainerServices
      */
     public function registerUtil()
     {
-        $this->registerService('util', function () {
-            $util = new \App\Helper\Util();
+        $container = $this->container;
 
-            return $util;
-        });
+        $util = new \App\Helper\Util($this->container);
+
+        $container->set('util', $util);
 
     }
 
+    //METHOD BELOW TO BE FIXED
     /**
      * Register 'notFoundHandler' on the container
      * @return void
@@ -387,3 +400,4 @@ class ContainerServices
         });
     }
 }
+
