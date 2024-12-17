@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends EnhancedModel
 {
-    protected $tablename = 'users'; 
-    
-    protected $capsule;
+    protected $tablename = 'users';
 
     public function __construct()
     {
