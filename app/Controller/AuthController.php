@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Model\User;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -17,6 +18,8 @@ class AuthController
 
     protected $view;
 
+    protected $user;
+
     /**
      * Save dependency container
      * @param \Slim\App $app slim application
@@ -27,6 +30,12 @@ class AuthController
         $this->container = $container;
 
         $this->view = $container->get('twig');
+
+        $this->user = new User();
+
+        $this->user->createTable($container);
+        
+        $this->user->setUtil($container);
     }
 
     /**
